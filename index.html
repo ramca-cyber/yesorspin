@@ -98,8 +98,8 @@
         const spinButton = document.getElementById('spinButton');
         const resultDiv = document.getElementById('result');
         const center = 160, radius = 150;
-        const segments = 8;
-        const labels = ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO'];
+        const segments = 16;
+        const labels = ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO'];
         const colors = ['#48bb78', '#f56565'];
         let isSpinning = false;
         let audioContext = null;
@@ -195,7 +195,8 @@
             wheel.style.transform = `rotate(${totalRotation}deg)`;
             setTimeout(() => {
                 const finalRotation = totalRotation % 360;
-                const sectionIndex = Math.floor(((360 - finalRotation + 22.5) % 360) / 45); // offset by 22.5deg
+                const degreesPerSegment = 360 / segments;
+                const sectionIndex = Math.floor(((360 - finalRotation + degreesPerSegment / 2) % 360) / degreesPerSegment);
                 const result = labels[sectionIndex];
                 resultDiv.textContent = `The answer is: ${result}`;
                 resultDiv.classList.add('show');
