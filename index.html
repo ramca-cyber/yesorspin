@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yes or No Wheel</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -12,35 +17,80 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 10px;
         }
         .container {
             background: white;
-            padding: 40px;
+            padding: 20px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
+            width: 100%;
+            max-width: 500px;
         }
         h1 {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             color: #333;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+        }
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .segment-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        .segment-control input[type="range"] {
+            width: 150px;
+        }
+        .segment-control input[type="number"] {
+            width: 50px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
         }
         .wheel-container {
             position: relative;
-            width: 320px;
-            height: 320px;
-            margin: 0 auto 30px auto;
+            width: 90vw;
+            max-width: 450px;
+            height: 90vw;
+            max-height: 450px;
+            margin: 0 auto 20px auto;
+        }
+        @media (min-width: 768px) {
+            .container {
+                padding: 40px;
+            }
+            h1 {
+                margin-bottom: 30px;
+            }
+            .controls {
+                margin-bottom: 30px;
+            }
+            .wheel-container {
+                width: 450px;
+                height: 450px;
+                margin-bottom: 30px;
+            }
         }
         .pointer {
             position: absolute;
-            top: -28px;
+            top: -5%;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 24px solid transparent;
-            border-right: 24px solid transparent;
-            border-top: 36px solid #333;
+            border-left: clamp(20px, 3vw, 24px) solid transparent;
+            border-right: clamp(20px, 3vw, 24px) solid transparent;
+            border-top: clamp(30px, 4vw, 36px) solid #333;
             z-index: 10;
         }
         .spin-button {
@@ -64,7 +114,7 @@
         }
         .result {
             margin-top: 20px;
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
             font-weight: 600;
             color: #333;
             min-height: 40px;
@@ -84,9 +134,16 @@
 <body>
     <div class="container">
         <h1>Yes or No Wheel</h1>
+        <div class="controls">
+            <div class="segment-control">
+                <label for="segmentSlider">Segments:</label>
+                <input type="range" id="segmentSlider" min="2" max="12" value="2" step="1">
+                <input type="number" id="segmentNumber" min="2" max="12" value="2" step="1">
+            </div>
+        </div>
         <div class="wheel-container">
             <div class="pointer"></div>
-            <svg id="wheel" width="320" height="320" viewBox="0 0 320 320" style="transition: transform 4s cubic-bezier(0.17,0.67,0.12,0.99);">
+            <svg id="wheel" width="100%" height="100%" viewBox="0 0 320 320" style="transition: transform 4s cubic-bezier(0.17,0.67,0.12,0.99);">
                 <!-- Wheel slices and text will be rendered by JS -->
             </svg>
         </div>
@@ -97,13 +154,48 @@
         const wheel = document.getElementById('wheel');
         const spinButton = document.getElementById('spinButton');
         const resultDiv = document.getElementById('result');
+        const segmentSlider = document.getElementById('segmentSlider');
+        const segmentNumber = document.getElementById('segmentNumber');
         const center = 160, radius = 150;
-        const segments = 16;
-        const labels = ['YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO', 'YES', 'NO'];
+        let segments = 2;
+        let labels = ['YES', 'NO'];
         const colors = ['#48bb78', '#f56565'];
         let isSpinning = false;
         let audioContext = null;
         let spinningSound = null;
+
+        function generateLabels(count) {
+            const result = [];
+            for (let i = 0; i < count; i++) {
+                result.push(i % 2 === 0 ? 'YES' : 'NO');
+            }
+            return result;
+        }
+
+        function updateSegments(count) {
+            segments = count;
+            labels = generateLabels(count);
+            drawWheel();
+        }
+
+        segmentSlider.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            segmentNumber.value = value;
+            if (!isSpinning) {
+                updateSegments(value);
+            }
+        });
+
+        segmentNumber.addEventListener('input', (e) => {
+            let value = parseInt(e.target.value);
+            if (value < 2) value = 2;
+            if (value > 12) value = 12;
+            e.target.value = value;
+            segmentSlider.value = value;
+            if (!isSpinning) {
+                updateSegments(value);
+            }
+        });
 
         // Draw the wheel
         function drawWheel() {
@@ -129,7 +221,7 @@
                 segment.setAttribute('stroke-width', '4');
                 wheel.appendChild(segment);
 
-                // Label position and rotation
+                // Label position and rotation (oriented along segment angle)
                 const midAngle = (startAngle + endAngle)/2;
                 const labelRadius = radius * 0.65;
                 const labelPos = polarToCartesian(center, center, labelRadius, midAngle);
@@ -138,9 +230,15 @@
                 text.setAttribute('y', labelPos.y);
                 text.setAttribute('text-anchor', 'middle');
                 text.setAttribute('dominant-baseline', 'middle');
-                text.setAttribute('font-size', '2rem');
+                
+                // Dynamic font size based on segment count
+                const fontSize = segments <= 4 ? '2rem' : segments <= 8 ? '1.5rem' : '1.2rem';
+                text.setAttribute('font-size', fontSize);
                 text.setAttribute('fill', '#fff');
                 text.setAttribute('font-weight', 'bold');
+                
+                // Rotate text to align along the radius (perpendicular to segment edge)
+                // midAngle points from center outward, so text is oriented radially
                 text.setAttribute('transform', `rotate(${midAngle+90} ${labelPos.x} ${labelPos.y})`);
                 text.textContent = labels[i];
                 wheel.appendChild(text);
