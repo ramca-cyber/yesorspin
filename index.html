@@ -56,28 +56,34 @@
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
         }
 
-        .wheel-half {
+        .wheel-section {
             position: absolute;
-            width: 100%;
+            width: 50%;
             height: 50%;
+            transform-origin: 100% 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: white;
             text-transform: uppercase;
             letter-spacing: 2px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
         }
 
-        .wheel-half.yes {
-            top: 0;
+        .wheel-section.yes {
             background: #48bb78;
         }
 
-        .wheel-half.no {
-            bottom: 0;
+        .wheel-section.no {
             background: #f56565;
+        }
+
+        .wheel-section span {
+            transform: rotate(-22.5deg);
+            margin-left: 30%;
+            margin-top: -15%;
         }
 
         .pointer {
@@ -161,8 +167,8 @@
                 height: 250px;
             }
 
-            .wheel-half {
-                font-size: 2rem;
+            .wheel-section {
+                font-size: 1.5rem;
             }
 
             .spin-button {
@@ -181,8 +187,8 @@
                 height: 200px;
             }
 
-            .wheel-half {
-                font-size: 1.5rem;
+            .wheel-section {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -193,8 +199,14 @@
         <div class="wheel-container">
             <div class="pointer"></div>
             <div class="wheel" id="wheel">
-                <div class="wheel-half yes">YES</div>
-                <div class="wheel-half no">NO</div>
+                <div class="wheel-section yes" style="transform: rotate(0deg);"><span>YES</span></div>
+                <div class="wheel-section no" style="transform: rotate(45deg);"><span>NO</span></div>
+                <div class="wheel-section yes" style="transform: rotate(90deg);"><span>YES</span></div>
+                <div class="wheel-section no" style="transform: rotate(135deg);"><span>NO</span></div>
+                <div class="wheel-section yes" style="transform: rotate(180deg);"><span>YES</span></div>
+                <div class="wheel-section no" style="transform: rotate(225deg);"><span>NO</span></div>
+                <div class="wheel-section yes" style="transform: rotate(270deg);"><span>YES</span></div>
+                <div class="wheel-section no" style="transform: rotate(315deg);"><span>NO</span></div>
             </div>
         </div>
         <button class="spin-button" id="spinButton">SPIN THE WHEEL</button>
@@ -206,6 +218,50 @@
         const spinButton = document.getElementById('spinButton');
         const resultDiv = document.getElementById('result');
         let isSpinning = false;
+        let audioContext = null;
+        let spinningSound = null;
+
+        // Initialize Web Audio API
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Create spinning sound effect
+        function playSpinSound() {
+            initAudio();
+            
+            // Stop any existing sound
+            if (spinningSound) {
+                try {
+                    spinningSound.stop();
+                } catch (e) {}
+            }
+
+            // Create oscillator for spinning sound
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Configure sound - a ticking/clicking sound effect
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(20, audioContext.currentTime);
+            
+            // Gradually slow down the frequency to simulate wheel slowing
+            oscillator.frequency.exponentialRampToValueAtTime(5, audioContext.currentTime + 3.5);
+            
+            // Volume envelope
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3.8);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 4);
+            
+            spinningSound = oscillator;
+        }
 
         spinButton.addEventListener('click', spinWheel);
 
@@ -216,6 +272,9 @@
             spinButton.disabled = true;
             resultDiv.textContent = '';
             resultDiv.classList.remove('show');
+
+            // Play spinning sound
+            playSpinSound();
 
             // Random number of spins (5-8 full rotations) plus random degrees
             const minSpins = 5;
@@ -236,8 +295,10 @@
                 // Normalize the final rotation to 0-360 range
                 const finalRotation = totalRotation % 360;
                 
-                // Determine result (pointer points at top, so 0-180 is YES, 180-360 is NO)
-                const result = finalRotation < 180 ? 'YES' : 'NO';
+                // 8 sections of 45 degrees each
+                // Sections: 0-45=YES, 45-90=NO, 90-135=YES, 135-180=NO, 180-225=YES, 225-270=NO, 270-315=YES, 315-360=NO
+                const sectionIndex = Math.floor(finalRotation / 45);
+                const result = sectionIndex % 2 === 0 ? 'YES' : 'NO';
                 
                 // Display result
                 resultDiv.textContent = `The answer is: ${result}`;
