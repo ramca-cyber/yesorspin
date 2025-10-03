@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yes or No Wheel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+
+        .wheel-half {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .wheel-half.yes {
+            top: 0;
+            background: #48bb78;
+        }
+
+        .wheel-half.no {
+            bottom: 0;
+            background: #f56565;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #333;
+            z-index: 10;
+        }
+
+        .spin-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .spin-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .spin-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result.show {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+
+            .wheel-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .wheel-half {
+                font-size: 2rem;
+            }
+
+            .spin-button {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+
+            .result {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .wheel-container {
+                width: 200px;
+                height: 200px;
+            }
+
+            .wheel-half {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Yes or No Wheel</h1>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <div class="wheel-half yes">YES</div>
+                <div class="wheel-half no">NO</div>
+            </div>
+        </div>
+        <button class="spin-button" id="spinButton">SPIN THE WHEEL</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const wheel = document.getElementById('wheel');
+        const spinButton = document.getElementById('spinButton');
+        const resultDiv = document.getElementById('result');
+        let isSpinning = false;
+
+        spinButton.addEventListener('click', spinWheel);
+
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            spinButton.disabled = true;
+            resultDiv.textContent = '';
+            resultDiv.classList.remove('show');
+
+            // Random number of spins (5-8 full rotations) plus random degrees
+            const minSpins = 5;
+            const maxSpins = 8;
+            const spins = Math.floor(Math.random() * (maxSpins - minSpins + 1)) + minSpins;
+            
+            // Random additional degrees (0-360)
+            const extraDegrees = Math.random() * 360;
+            
+            // Total rotation
+            const totalRotation = (spins * 360) + extraDegrees;
+            
+            // Apply rotation
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            
+            // Calculate result after spin completes
+            setTimeout(() => {
+                // Normalize the final rotation to 0-360 range
+                const finalRotation = totalRotation % 360;
+                
+                // Determine result (pointer points at top, so 0-180 is YES, 180-360 is NO)
+                const result = finalRotation < 180 ? 'YES' : 'NO';
+                
+                // Display result
+                resultDiv.textContent = `The answer is: ${result}`;
+                resultDiv.classList.add('show');
+                
+                isSpinning = false;
+                spinButton.disabled = false;
+                
+                // Reset rotation for next spin (keep visual position but reset transform)
+                setTimeout(() => {
+                    wheel.style.transition = 'none';
+                    wheel.style.transform = `rotate(${finalRotation}deg)`;
+                    setTimeout(() => {
+                        wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+                    }, 50);
+                }, 100);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
