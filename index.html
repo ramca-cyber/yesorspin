@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             display: flex;
@@ -21,7 +20,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
         }
-
         .container {
             text-align: center;
             background: white;
@@ -31,21 +29,18 @@
             max-width: 500px;
             width: 100%;
         }
-
         h1 {
             color: #333;
             margin-bottom: 30px;
             font-size: 2rem;
             font-weight: 600;
         }
-
         .wheel-container {
             position: relative;
             width: 300px;
             height: 300px;
             margin: 0 auto 30px;
         }
-
         .wheel {
             width: 100%;
             height: 100%;
@@ -55,12 +50,12 @@
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
             transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
         }
-
         .wheel-section {
             position: absolute;
             width: 50%;
             height: 50%;
-            transform-origin: 100% 100%;
+            top: 25%;
+            left: 25%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -69,23 +64,19 @@
             color: white;
             text-transform: uppercase;
             letter-spacing: 2px;
-            clip-path: polygon(0 0, 100% 0, 100% 100%);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
         }
-
-        .wheel-section.yes {
-            background: #48bb78;
-        }
-
-        .wheel-section.no {
-            background: #f56565;
-        }
-
+        .wheel-section.yes { background: #48bb78; }
+        .wheel-section.no  { background: #f56565; }
         .wheel-section span {
-            transform: rotate(-22.5deg);
-            margin-left: 30%;
-            margin-top: -15%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform-origin: 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
         }
-
         .pointer {
             position: absolute;
             top: -20px;
@@ -98,7 +89,6 @@
             border-top: 30px solid #333;
             z-index: 10;
         }
-
         .spin-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -111,21 +101,17 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-
         .spin-button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
-
         .spin-button:active:not(:disabled) {
             transform: translateY(0);
         }
-
         .spin-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-
         .result {
             margin-top: 20px;
             font-size: 1.5rem;
@@ -136,11 +122,9 @@
             align-items: center;
             justify-content: center;
         }
-
         .result.show {
             animation: fadeIn 0.5s ease;
         }
-
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -151,42 +135,34 @@
                 transform: translateY(0);
             }
         }
-
         @media (max-width: 600px) {
             .container {
                 padding: 30px 20px;
             }
-
             h1 {
                 font-size: 1.5rem;
                 margin-bottom: 20px;
             }
-
             .wheel-container {
                 width: 250px;
                 height: 250px;
             }
-
             .wheel-section {
                 font-size: 1.5rem;
             }
-
             .spin-button {
                 padding: 12px 30px;
                 font-size: 1rem;
             }
-
             .result {
                 font-size: 1.2rem;
             }
         }
-
         @media (max-width: 400px) {
             .wheel-container {
                 width: 200px;
                 height: 200px;
             }
-
             .wheel-section {
                 font-size: 1.2rem;
             }
@@ -199,20 +175,35 @@
         <div class="wheel-container">
             <div class="pointer"></div>
             <div class="wheel" id="wheel">
-                <div class="wheel-section yes" style="transform: rotate(0deg);"><span>YES</span></div>
-                <div class="wheel-section no" style="transform: rotate(45deg);"><span>NO</span></div>
-                <div class="wheel-section yes" style="transform: rotate(90deg);"><span>YES</span></div>
-                <div class="wheel-section no" style="transform: rotate(135deg);"><span>NO</span></div>
-                <div class="wheel-section yes" style="transform: rotate(180deg);"><span>YES</span></div>
-                <div class="wheel-section no" style="transform: rotate(225deg);"><span>NO</span></div>
-                <div class="wheel-section yes" style="transform: rotate(270deg);"><span>YES</span></div>
-                <div class="wheel-section no" style="transform: rotate(315deg);"><span>NO</span></div>
+                <div class="wheel-section yes" style="transform: rotate(0deg);">
+                  <span style="transform: rotate(0deg);">YES</span>
+                </div>
+                <div class="wheel-section no" style="transform: rotate(45deg);">
+                  <span style="transform: rotate(45deg);">NO</span>
+                </div>
+                <div class="wheel-section yes" style="transform: rotate(90deg);">
+                  <span style="transform: rotate(90deg);">YES</span>
+                </div>
+                <div class="wheel-section no" style="transform: rotate(135deg);">
+                  <span style="transform: rotate(135deg);">NO</span>
+                </div>
+                <div class="wheel-section yes" style="transform: rotate(180deg);">
+                  <span style="transform: rotate(180deg);">YES</span>
+                </div>
+                <div class="wheel-section no" style="transform: rotate(225deg);">
+                  <span style="transform: rotate(225deg);">NO</span>
+                </div>
+                <div class="wheel-section yes" style="transform: rotate(270deg);">
+                  <span style="transform: rotate(270deg);">YES</span>
+                </div>
+                <div class="wheel-section no" style="transform: rotate(315deg);">
+                  <span style="transform: rotate(315deg);">NO</span>
+                </div>
             </div>
         </div>
         <button class="spin-button" id="spinButton">SPIN THE WHEEL</button>
         <div class="result" id="result"></div>
     </div>
-
     <script>
         const wheel = document.getElementById('wheel');
         const spinButton = document.getElementById('spinButton');
@@ -220,99 +211,75 @@
         let isSpinning = false;
         let audioContext = null;
         let spinningSound = null;
-
         // Initialize Web Audio API
         function initAudio() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
         }
-
         // Create spinning sound effect
         function playSpinSound() {
             initAudio();
-            
             // Stop any existing sound
             if (spinningSound) {
                 try {
                     spinningSound.stop();
                 } catch (e) {}
             }
-
             // Create oscillator for spinning sound
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
             // Configure sound - a ticking/clicking sound effect
             oscillator.type = 'square';
             oscillator.frequency.setValueAtTime(20, audioContext.currentTime);
-            
             // Gradually slow down the frequency to simulate wheel slowing
             oscillator.frequency.exponentialRampToValueAtTime(5, audioContext.currentTime + 3.5);
-            
             // Volume envelope
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3.8);
-            
-            oscillator.start(audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 4);
+            oscillator.start();
             oscillator.stop(audioContext.currentTime + 4);
-            
             spinningSound = oscillator;
         }
-
         spinButton.addEventListener('click', spinWheel);
-
         function spinWheel() {
             if (isSpinning) return;
-            
             isSpinning = true;
             spinButton.disabled = true;
             resultDiv.textContent = '';
             resultDiv.classList.remove('show');
-
-            // Play spinning sound
             playSpinSound();
-
             // Random number of spins (5-8 full rotations) plus random degrees
             const minSpins = 5;
             const maxSpins = 8;
             const spins = Math.floor(Math.random() * (maxSpins - minSpins + 1)) + minSpins;
-            
             // Random additional degrees (0-360)
             const extraDegrees = Math.random() * 360;
-            
             // Total rotation
             const totalRotation = (spins * 360) + extraDegrees;
-            
             // Apply rotation
             wheel.style.transform = `rotate(${totalRotation}deg)`;
-            
             // Calculate result after spin completes
             setTimeout(() => {
                 // Normalize the final rotation to 0-360 range
                 const finalRotation = totalRotation % 360;
-                
                 // 8 sections of 45 degrees each
                 // Sections: 0-45=YES, 45-90=NO, 90-135=YES, 135-180=NO, 180-225=YES, 225-270=NO, 270-315=YES, 315-360=NO
                 const sectionIndex = Math.floor(finalRotation / 45);
                 const result = sectionIndex % 2 === 0 ? 'YES' : 'NO';
-                
                 // Display result
                 resultDiv.textContent = `The answer is: ${result}`;
                 resultDiv.classList.add('show');
-                
                 isSpinning = false;
                 spinButton.disabled = false;
-                
                 // Reset rotation for next spin (keep visual position but reset transform)
                 setTimeout(() => {
                     wheel.style.transition = 'none';
                     wheel.style.transform = `rotate(${finalRotation}deg)`;
                     setTimeout(() => {
-                        wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+                        wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)`;
                     }, 50);
                 }, 100);
             }, 4000);
